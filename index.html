@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>京东查货监控</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+<div class="container">
+    <div class="col-lg-8 col-lg-offset-2" align="center">
+        <br>
+        <br>
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h2 align="center">京东查货监控</h2></div>
+            <div class="panel-body">
+                <form action="dologin.php?action=user" method="post">
+                    <br>
+                    <div class="input-group">
+                        <div class="input-group-addon ">商品ID：</div>
+                        <input type="text" id="s0" class="form-control" placeholder="不能为空" required>
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <div class="input-group-addon ">省:</div>
+                        <select id="s1" class="form-control" onclick="s11()" >
+                        </select>
+                        <div class="input-group-addon ">城:</div>
+                        <select id="s2" class="form-control" onclick="s22()">
+                        </select>
+                        <div class="input-group-addon ">区:</div>
+                        <select id="s3" class="form-control" onclick="s33()">
+                        </select>
+                    </div>
+                    <br>
+                    <button class="btn btn-primary btn-block" type="button" onclick="check()"> 查库存</button>
+                    <br>
+                    <div align="left">库存日志：</div>
+                    <textarea id="s4" class="form-control" style="resize:none;" rows="5"></textarea>
+                </form>
+            </div>
+            <div class="panel-footer">&copy; 2021 京东查货监控, Inc.</div>
+        </div>
+    </div>
+
+</div>
+<script>
+    var s0=$("#s0");
+    var s1=$("#s1");
+    var s2=$("#s2");
+    var s3=$("#s3");
+    var s4=$("#s4");
+    var time1;
+    function s11(){
+        $.get("jdarea/4744.json",function (e){
+            if($.trim(s1.html())===""){
+                for(i=0;i<e.length;i++){
+                    s1.append("<option value='"+e[i]['id']+"'>"+e[i]['name']+"</option>");
+                }
+            }
+            s2.empty();
+            //$("#s1").append("<option value=''>--</option>");
+        })
+    }
+    function s22(){
+        if(s1.val()!=="" && s1.val()!==null){
+            $.get("jdarea/"+s1.val()+".json",function (e){
+                if($.trim(s2.html())===""){
+                    for(i=0;i<e.length;i++){
+                        s2.append("<option value='"+e[i]['id']+"'>"+e[i]['name']+"</option>");
+                    }
+                }
+                s3.empty();
+            })
+        }else {
+            alert("请选择省份！")
+        }
+    }
+    function s33(){
+        if(s2.val()!=="" && s2.val()!==null){
+            $.get("jdarea/"+s2.val()+".json",function (e){
+                if($.trim(s3.html())===""){
+                    for(i=0;i<e.length;i++){
+                        s3.append("<option value='"+e[i]['id']+"'>"+e[i]['name']+"</option>");
+                    }
+                }
+            })
+        }else {
+            alert("请选择城市！")
+        }
+    }
+    function check(){
+        if(s0.val()!=="" && s0.val()!==null && s1.val()!=="" && s1.val()!==null
+            && s2.val()!=="" && s2.val()!==null  && s3.val()!=="" && s3.val()!==null){
+            clearTimeout(time1);
+            time1=setInterval(function (){
+                area=s1.val()+"_"+s2.val()+"_"+s3.val()+"_0"
+                gid=s0.val();
+                $.get("http://bj.danran0.cc/jd.php?skuIds="+gid+"&area="+area,function (e){
+                    s4.val("商品："+e['id']+" 状态："+e['status']+"  时间："+e['time']+"\n"+s4.val());
+                    if(s4.val().length>3000){
+                        s4.val("");
+                    }
+                })
+            },2000)
+        }else {
+            alert("信息不完整");
+        }
+    }
+    $(function (){
+        s11();
+        s1.change(function (){
+            if(s1.val()!=="" && s1.val()!==null){
+                s22();
+            }
+        });
+    })
+</script>
+</body>
