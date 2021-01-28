@@ -40,6 +40,7 @@
                     </div>
                     <br>
                     <button class="btn btn-primary btn-block" type="button" onclick="check()"> 查库存</button>
+                    <button class="btn btn-warning btn-block" type="button" onclick="opens()"> 打开商品</button>
                     <br>
                     <div align="left">库存日志：</div>
                     <textarea id="s4" class="form-control" style="resize:none;" rows="5"></textarea>
@@ -113,11 +114,19 @@
             alert("信息不完整");
         }
     }
+    function opens(){
+        window.open("https://item.jd.com/"+s0.val()+".html")
+    }
     $(function (){
         s11();
         s1.change(function (){
             if(s1.val()!=="" && s1.val()!==null){
                 s22();
+            }
+        });
+        s2.change(function (){
+            if(s2.val()!=="" && s2.val()!==null){
+                s33();
             }
         });
     })
